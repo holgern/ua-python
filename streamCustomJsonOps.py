@@ -106,7 +106,11 @@ if __name__ == "__main__":
     
         # Update current node list from @fullnodeupdate
         nodes = NodeList()
-        nodes.update_nodes()
+        # nodes.update_nodes(weights={"block": 1})
+        try:
+            nodes.update_nodes()
+        except:
+            print("could not update nodes")
         node_list = nodes.get_nodes(normal=normal, appbase=appbase, wss=wss, https=https)
         stm = Steem(node=node_list, num_retries=5, call_num_retries=3, timeout=15)
         
@@ -152,7 +156,7 @@ if __name__ == "__main__":
         last_trx_id = '0' * 40
         op_num = 0
         print("start_streaming")
-        for op in b.stream(start=int(start_block), stop=int(end_block_round), opNames=["account_create", "account_create_with_delegation", "pow", "pow2", "custom_json"], max_batch_size=max_batch_size, threading=threading, thread_num=8):
+        for op in b.stream(start=int(start_block), stop=int(end_block_round), opNames=["account_create", "account_create_with_delegation", "create_claimed_account", "pow", "pow2", "custom_json"], max_batch_size=max_batch_size, threading=threading, thread_num=8):
             block_num = op["block_num"]
             # print(block_num)
             if last_block_num is None:
@@ -290,7 +294,7 @@ if __name__ == "__main__":
                 data["new_account_id"] = next_account_id
                 next_account_id += 1
                 db_data.append(data)
-            elif op["type"] == "account_create" or op["type"] == "account_create_with_delegation":
+            elif op["type"] == "account_create" or op["type"] == "account_create_with_delegation" or op["type"] == "create_claimed_account":
                 # data["id"] = "new_account"
                 new_accounts_found += 1
                 account_name = op["new_account_name"]
